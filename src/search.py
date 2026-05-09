@@ -1,3 +1,7 @@
+from pgvector_helper import get_pgvector
+from langchain.prompts import PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
+
 PROMPT_TEMPLATE = """
 CONTEXTO:
 {contexto}
@@ -24,6 +28,7 @@ PERGUNTA DO USUÁRIO:
 
 RESPONDA A "PERGUNTA DO USUÁRIO"
 """
+prompt_template = PromptTemplate(input_variables=["contexto", "pergunta"], template=PROMPT_TEMPLATE)
 
 def search_prompt(question=None):
-    pass
+  return prompt_template
