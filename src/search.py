@@ -1,3 +1,5 @@
+from langchain.prompts import PromptTemplate
+
 PROMPT_TEMPLATE = """
 CONTEXTO:
 {contexto}
@@ -25,5 +27,7 @@ PERGUNTA DO USUÁRIO:
 RESPONDA A "PERGUNTA DO USUÁRIO"
 """
 
-def search_prompt(question=None):
-    pass
+RAG_PROMPT: PromptTemplate = PromptTemplate(
+  input_variables=["contexto", "pergunta"],
+  template=PROMPT_TEMPLATE,
+)
