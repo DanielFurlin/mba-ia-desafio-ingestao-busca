@@ -3,7 +3,8 @@ from langchain_openai import ChatOpenAI
 from vector_store import get_vector_store
 from search import RAG_PROMPT
 from settings import settings
-
+from dotenv import load_dotenv
+load_dotenv()
 
 def main() -> None:
     if settings.google_chatbot_model:
@@ -16,7 +17,7 @@ def main() -> None:
     chain = RAG_PROMPT | chat_model
     try:
         while True:
-            question = input("Faça sua pergunta: ")
+            question = input("Faça sua pergunta[\"sair\" para finalizar]: ")
             if not question or question.lower() in ["exit", "sair", "fim"]:
                 break
             results = vector_store.similarity_search_with_score(question, k=10)
