@@ -1,28 +1,33 @@
-import os
-
-from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from vector_store import get_vector_store
 from search import RAG_PROMPT
-from langchain.chat_models import init_chat_model
+from settings import settings
 
-load_dotenv()
 
 def main() -> None:
-  chat_model = init_chat_model(model=os.getenv("CHATBOT_MODEL"))
-  vector_store = get_vector_store()
-  chain = RAG_PROMPT | chat_model
-  try:
-    while True:
-      question = input("Faça sua pergunta: ")
-      if not question or question.lower() in ["exit", "sair", "fim"]:
-        break
-      results = vector_store.similarity_search_with_score(question, k=10)
-      answer = chain.invoke({"contexto": results, "pergunta": question})
-      print(answer.content)
-  except EOFError:
-    pass
-  finally:
-    print("\nEncerrando o programa.")
+    if settings.google_chatbot_model:
+        chat_model = ChatGoogleGenerativeAI(model=settings.google_chatbot_model)
+    elif settings.openai_chatbot_model:
+        chat_model = ChatOpenAI(model=settings.openai_chatbot_model)
+    else:
+        raise ValueError("A variável de ambiente GOOGLE_CHATBOT_MODEL não está definida.")
+    vector_store = get_vector_store()
+    chain = RAG_PROMPT | chat_model
+    try:
+        while True:
+            question = input("Faça sua pergunta: ")
+            if not question or question.lower() in ["exit", "sair", "fim"]:
+                break
+            results = vector_store.similarity_search_with_score(question, k=10)
+            contexto = "\n\n".join(doc.page_content for doc, _ in results)
+            answer = chain.invoke({"contexto": contexto, "pergunta": question})
+            print(answer.content)
+    except EOFError:
+        pass
+    finally:
+        print("\nEncerrando o programa.")
+
 
 if __name__ == "__main__":
-  main()
+    main()
